@@ -7,18 +7,25 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("postgres://bnfbbdar:1SOpqQz084qadkE6HDevYg7pZFVtBR5o@silly.db.elephantsql.com/bnfbbdar")
+  url      = env("DATABASE_URL_PRISMA")
 }
 
-model pessoas {
-  id          String     @id @default(uuid())
-  name        String     @db.VarChar(255)
-  gender      String     @db.VarChar(255)
+model pessoa {
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(254)
+  surname     String?  @db.VarChar(254)
+  gender      Boolean
   birthday    DateTime
-  create_time DateTime   @default(now())
-  update_time DateTime   @updatedAt
-  location    location[]
-  comments    contents[]
+  create_time DateTime @default(now())
+  update_time DateTime @updatedAt
+
+  location_id Int
+  location    location @relation(fields: [location_id], references: [id])
+
+  comments            contents[]
+  pessoas_on_contacts pessoas_on_contacts[]
+
+  @@index([location_id])
 }
 
 model location {
@@ -28,10 +35,9 @@ model location {
   city      Int
   state     Int
   nation    String  @db.Char(2)
-  pessoa_id String
-  pessoa    pessoas @relation(fields: [pessoa_id], references: [id])
 
-  @@index([pessoa_id])
+  pessoa  pessoa[]
+  contact contact[]
 }
 
 model contents {
@@ -40,7 +46,29 @@ model contents {
   create_time DateTime @default(now())
   update_time DateTime @updatedAt
   pessoa_id   String
-  pessoa      pessoas  @relation(fields: [pessoa_id], references: [id])
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
 
   @@index([pessoa_id])
+}
+
+model contact {
+  email  String   @id @db.VarChar(254)
+  tel    String?  @db.VarChar(254)
+  name   String   @db.VarChar(254)
+  gender Boolean?
+
+  location_id         Int
+  location            location              @relation(fields: [location_id], references: [id])
+  pessoas_on_contacts pessoas_on_contacts[]
+
+  @@index([location_id])
+}
+
+model pessoas_on_contacts {
+  pessoa     pessoa  @relation(fields: [pessoa_id], references: [id])
+  pessoa_id  String
+  contact    contact @relation(fields: [contact_id], references: [email])
+  contact_id String
+
+  @@id([pessoa_id, contact_id])
 }
