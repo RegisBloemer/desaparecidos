@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("postgres://bnfbbdar:1SOpqQz084qadkE6HDevYg7pZFVtBR5o@silly.db.elephantsql.com/bnfbbdar")
+}
+
+model pessoas {
+  id          String     @id @default(uuid())
+  name        String     @db.VarChar(255)
+  gender      String     @db.VarChar(255)
+  birthday    DateTime
+  create_time DateTime   @default(now())
+  update_time DateTime   @updatedAt
+  location    location[]
+  comments    contents[]
+}
+
+model location {
+  id        Int     @id @default(autoincrement())
+  latitude  Decimal @db.Decimal
+  longitude Decimal @db.Decimal
+  city      Int
+  state     Int
+  nation    String  @db.Char(2)
+  pessoa_id String
+  pessoa    pessoas @relation(fields: [pessoa_id], references: [id])
+
+  @@index([pessoa_id])
+}
+
+model contents {
+  id          String   @id @default(uuid())
+  content     String   @db.Text
+  create_time DateTime @default(now())
+  update_time DateTime @updatedAt
+  pessoa_id   String
+  pessoa      pessoas  @relation(fields: [pessoa_id], references: [id])
+
+  @@index([pessoa_id])
+}
