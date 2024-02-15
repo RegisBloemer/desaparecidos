@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 
 export default function Home() {
@@ -29,49 +28,62 @@ export default function Home() {
       setSearchResults([]);
     }
   };
+
+  // Certifique-se de que searchResults e pessoas são sempre arrays
+  const list = searchResults.length > 0 ? searchResults : pessoas;
+  const listToRender = Array.isArray(list) ? list : [];
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
-        <a className="navbar-brand" href="#">Pessoas Desaparecidas</a>
-        <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <a className="navbar-brand col-3 text-center" href="#">Buscar Pessoas Desaparecidas</a>
+        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
           <span className="navbar-toggler-icon"></span>
         </button>
+
         <div className="collapse navbar-collapse" id="navbarNavDropdown">
-          <ul className="navbar-nav">
-            <li className="nav-item active">
-              <a className="nav-link" href="#">Início <span className="sr-only">(current)</span></a>
-            </li>
-            {/* Outros itens do menu, se necessário */}
-          </ul>
-          <form className="form-inline my-2 my-lg-0" onSubmit={handleSearch}>
-            <input className="form-control mr-sm-2" type="search" placeholder="Nome" aria-label="Nome" onChange={(e) => setSearchTerm(e.target.value)} />
-            <select className="form-control mr-sm-2" aria-label="Pais">
-              <option selected>Pais</option>
-              {/* Substitua pelos estados */}
-              <option value="1">Brasil</option>
-              <option value="2">Argentina</option>
-            </select>
-            <select className="form-control mr-sm-2" aria-label="Estado">
-              <option selected>Estado</option>
-              {/* Substitua pelos estados */}
-              <option value="1">São Paulo</option>
-              <option value="2">Rio de Janeiro</option>
-            </select>
-            <select className="form-control mr-sm-2" aria-label="Cidade">
-              <option selected>Cidade</option>
-              {/* Substitua pelas cidades */}
-              <option value="1">São Paulo</option>
-              <option value="2">Rio de Janeiro</option>
-            </select>
-            <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Pesquisar</button>
-          </form>
+
+          <form className="form-inline my-2 my-lg-0 col" onSubmit={handleSearch}>
+            <div className="row">
+              <div className="col-4 mb-2">
+                <input className="form-control" type="search" placeholder="Nome" aria-label="Nome" onChange={(e) => setSearchTerm(e.target.value)} />
+              </div>
+              <div className="col-3 mb-2">
+                <select className="form-control" aria-label="Pais">
+                  <option selected>País</option>
+                  {/* Substitua pelos países */}
+                  <option value="1">Brasil</option>
+                  <option value="2">Argentina</option>
+                </select>
+              </div>
+              <div className="col-3 mb-2 ml">
+                <select className="form-control" aria-label="Estado">
+                  <option selected>Estado</option>
+                  {/* Substitua pelos estados */}
+                  <option value="1">São Paulo</option>
+                  <option value="2">Rio de Janeiro</option>
+                </select>
+              </div>
+              <div className="col-4 mb-2">
+                <select className="form-control" aria-label="Cidade">
+                  <option selected>Cidade</option>
+                  {/* Substitua pelas cidades */}
+                  <option value="1">São Paulo</option>
+                  <option value="2">Rio de Janeiro</option>
+                </select>
+              </div>
+              <div className="col mb-2">
+                <button className="btn btn-outline-success " type="submit">Pesquisar</button>
+              </div>
+            </div>
+        </form>
         </div>
       </nav>
       <div className="container mt-5">
         {message && <p>{message}</p>}
-        <h2>{searchResults.length > 0 ? 'Resultados da Pesquisa' : 'Últimas Pessoas Adicionadas'}</h2>
+        <h2>{listToRender.length > 0 ? 'Resultados da Pesquisa' : 'Últimas Pessoas Adicionadas'}</h2>
         <div className="list-group">
-          {(searchResults.length > 0 ? searchResults : pessoas).map((pessoa) => (
+          {listToRender.map((pessoa) => (
             <a href="#" className="list-group-item list-group-item-action" key={pessoa.id}>
               <h5 className="mb-1">{pessoa.name}</h5>
               {/* Inclua mais detalhes que você deseja mostrar */}
@@ -81,5 +93,4 @@ export default function Home() {
       </div>
     </>
   );
-};
-
+}
