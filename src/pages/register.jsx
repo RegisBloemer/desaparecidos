@@ -21,17 +21,12 @@ export default function ProfileEdit(props) {
     formState: { errors },
   } = useForm();
 
-  const [select_counry, set_select_counry] = useState(false);
-  const [select_uf, set_select_uf] = useState(false);
-  const [select_city, set_select_city] = useState(false);
-  const [loading, set_loading] = useState(false);
-
-  const get_uf = async () => {
+  const get_uf = async (select_counry) => {
     if (!select_counry) {
       return false;
     }
     console.log("uf", select_counry);
-
+    set_loading_uf(true);
     try {
       const res = await axios(
         `https://www.geonames.org/servlet/geonames?&srv=163&country=${select_counry.ISO}&featureCode=ADM1&lang=en&type=json`
@@ -44,24 +39,42 @@ export default function ProfileEdit(props) {
     } catch (err) {
       console.log("err", err);
       throw new Error("Network response was not ok");
+    } finally {
+      set_loading_uf(false);
     }
   };
 
   const [uf_options, set_uf_options] = useState(get_uf);
 
+  const [select_counry, set_select_counry] = useState({
+    value: 76,
+    label: "Brazil",
+    ISO: "BR",
+  });
+  const [select_nation, set_select_nation] = useState({
+    value: 76,
+    label: "Brazil",
+    ISO: "BR",
+  });
+  const [select_uf, set_select_uf] = useState(false);
+  const [select_city, set_select_city] = useState(false);
+  const [loading_submit, set_loading_submit] = useState(false);
+  const [loading_uf, set_loading_uf] = useState(false);
+  const [loading_city, set_loading_city] = useState(false);
+
   useEffect(() => {
-    get_uf().then((e) => {
+    get_uf(select_counry).then((e) => {
       set_uf_options(e);
     });
   }, [select_counry]);
 
-  const get_city = async () => {
+  const get_city = async (select_uf) => {
     if (!select_uf) {
       return false;
     }
 
     console.log("city", select_uf);
-
+    set_loading_city(true);
     try {
       const res = await axios(
         `https://www.geonames.org/servlet/geonames?&srv=163&country=${
@@ -80,11 +93,13 @@ export default function ProfileEdit(props) {
     } catch (err) {
       console.log("err", err);
       throw new Error("Network response was not ok");
+    } finally {
+      set_loading_city(false);
     }
   };
 
   useEffect(() => {
-    get_city().then((e) => {
+    get_city(select_uf).then((e) => {
       set_city_options(e);
     });
   }, [select_uf]);
@@ -93,7 +108,7 @@ export default function ProfileEdit(props) {
 
   const onSubmit = async (data) => {
     console.log("onSubmit", data);
-    set_loading(true);
+    set_loading_submit(true);
 
     let body = {
       username: data.name,
@@ -125,17 +140,19 @@ export default function ProfileEdit(props) {
       }
     }
 
-    set_loading(false);
+    set_loading_submit(false);
   };
 
   return (
     <Layout>
       <Head>
-        <title>Regristro de pessoa</title>
+        <title>Cadastro de pessoa</title>
       </Head>
       <main className="mt-5 py-5">
-        <section className="container mb-5">
-          <h1>Informações Básicas</h1>
+        <section className="container mb-5 text-center">
+          <h1>Cadastro de pessoa desaparecidas</h1>
+          <br />
+          <h4>Informações Básicas</h4>
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="g-3 needs-validation mt-5 pt-5"
@@ -157,7 +174,7 @@ export default function ProfileEdit(props) {
               />
               {errors.name && (
                 <div className="invalid-feedback">
-                  Por favor ensira um nome válido!
+                  Por favor insira um nome válido!
                 </div>
               )}
             </div>
@@ -168,44 +185,79 @@ export default function ProfileEdit(props) {
               <input
                 type="text"
                 id="surname"
-                className={`form-control rounded-5 shadow`}
+                className="form-control rounded-5 shadow"
               />
             </div>
-            <div className="col-sm-6 mx-auto mt-4">
-              <label htmlFor="name" className="form-label">
-                Data de nascimento <span className="text-danger">*</span>
-              </label>
-              <input
-                type="date"
-                id="birthday"
-                className={`form-control px-2 pt-1 m-2 border ${
-                  errors.birthday ? "is-invalid" : ""
-                } rounded-5 shadow`}
-                {...register("birthday", {
-                  valueAsDate: true,
-                  required: "required",
-                })}
-              />
-              {errors.birthday && (
-                <div className="invalid-feedback">
-                  Por favor ensira uma data de nascimento valida!
-                </div>
-              )}
+            <div className="row mx-auto justify-content-center mt-4">
+              <div className="col-sm-3">
+                <label htmlFor="weight" className="form-label">
+                  Peso aproximado
+                </label>
+                <input
+                  type="number"
+                  id="weight"
+                  className="form-control rounded-5 shadow"
+                />
+              </div>
+              <div className="col-sm-3">
+                <label htmlFor="name" className="form-label">
+                  Data de nascimento <span className="text-danger">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="birthday"
+                  className={`form-control px-2 pt-1 m-2 border ${
+                    errors.birthday ? "is-invalid" : ""
+                  } rounded-5 shadow`}
+                  {...register("birthday", {
+                    valueAsDate: true,
+                    required: "required",
+                  })}
+                />
+                {errors.birthday && (
+                  <div className="invalid-feedback">
+                    Por favor insira uma data de nascimento valida!
+                  </div>
+                )}
+              </div>
             </div>
             <div className="col-sm-6 mx-auto mt-4">
               <label htmlFor="nation" className="form-label">
                 Nacionalidade
               </label>
-              <input
-                type="text"
-                id="nation"
-                className="form-control rounded-5 shadow"
+              <Controller
+                name="nation"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={props.countries}
+                    onChange={(e) => {
+                      set_select_nation(e);
+                      field.onChange(e);
+                    }}
+                    value={select_nation}
+                    instanceId="nation-select"
+                    placeholder="Nacionalidade"
+                    styles={{
+                      control: (baseStyles, state) => ({
+                        ...baseStyles,
+                        borderRadius: "var(--bs-border-radius-xxl)!important",
+                        margin: ".5rem!important",
+                        border:
+                          "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
+                        boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
+                      }),
+                    }}
+                  />
+                )}
               />
             </div>
-            <div className="row mx-auto mt-4">
-              <h5>Último lugar de onde a pessoa foi vista</h5>
-              <div className="col-sm-6 my-3">
-                <label>Selecione seu pais</label>
+            <div className="row col-sm-9 mx-auto mt-5 pt-5">
+              <h5 className="mb-4">Local onde a pessoa foi vista pela última vez</h5>
+              <div className="col-sm-4 mb-3">
+                <label>Selecione pais</label>
                 <Controller
                   name="counry"
                   control={control}
@@ -216,6 +268,7 @@ export default function ProfileEdit(props) {
                       {...field}
                       options={props.countries}
                       onChange={(e) => {
+                        console.log("counry", e);
                         set_select_counry(e);
                         set_select_uf(false);
                         set_select_city(false);
@@ -245,77 +298,95 @@ export default function ProfileEdit(props) {
                   </div>
                 )}
               </div>
-              <div className="col-sm-6 mb-3">
-                <label className="w-100">Selecione seu estado</label>
-                <Controller
-                  name="uf"
-                  control={control}
-                  defaultValue=""
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={uf_options}
-                      onChange={(e) => {
-                        set_select_uf(e);
-                        set_select_city(false);
-                        field.onChange(e);
-                      }}
-                      value={select_uf}
-                      instanceId="uf-select"
-                      placeholder="Estados"
-                      className={errors.uf ? "is-invalid" : ""}
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          borderRadius: "var(--bs-border-radius-xxl)!important",
-                          margin: ".5rem!important",
-                          border:
-                            "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
-                          boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
-                        }),
-                      }}
-                    />
-                  )}
-                />
+              <div className="col-sm-4 mb-3">
+                <label className="w-100">Selecione estado</label>
+                {loading_uf ? (
+                  <div className="text-center">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                ) : (
+                  <Controller
+                    name="uf"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={uf_options}
+                        onChange={(e) => {
+                          set_select_uf(e);
+                          set_select_city(false);
+                          field.onChange(e);
+                        }}
+                        value={select_uf}
+                        instanceId="uf-select"
+                        placeholder="Estados"
+                        className={errors.uf ? "is-invalid" : ""}
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            borderRadius:
+                              "var(--bs-border-radius-xxl)!important",
+                            margin: ".5rem!important",
+                            border:
+                              "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
+                            boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
+                          }),
+                        }}
+                      />
+                    )}
+                  />
+                )}
                 {errors.uf && (
                   <div className="invalid-feedback">
                     Por favor escolha estado!
                   </div>
                 )}
               </div>
-              <div className="col-sm-6 mb-3">
-                <label className="w-100">Selecione sua cidade</label>
-                <Controller
-                  name="city"
-                  control={control}
-                  defaultValue=""
-                  rules={{ required: true }}
-                  render={({ field }) => (
-                    <Select
-                      {...field}
-                      options={city_options}
-                      onChange={(e) => {
-                        set_select_city(e);
-                        field.onChange(e);
-                      }}
-                      value={select_city}
-                      instanceId="city-select"
-                      placeholder="Cidades"
-                      className={errors.city ? "is-invalid" : ""}
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          borderRadius: "var(--bs-border-radius-xxl)!important",
-                          margin: ".5rem!important",
-                          border:
-                            "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
-                          boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
-                        }),
-                      }}
-                    />
-                  )}
-                />
+              <div className="col-sm-4 mb-3">
+                <label className="w-100">Selecione cidade</label>
+                {loading_city ? (
+                  <div className="text-center">
+                    <div className="spinner-border text-primary" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                ) : (
+                  <Controller
+                    name="city"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        {...field}
+                        options={city_options}
+                        onChange={(e) => {
+                          set_select_city(e);
+                          field.onChange(e);
+                        }}
+                        value={select_city}
+                        instanceId="city-select"
+                        placeholder="Cidades"
+                        className={errors.city ? "is-invalid" : ""}
+                        styles={{
+                          control: (baseStyles, state) => ({
+                            ...baseStyles,
+                            borderRadius:
+                              "var(--bs-border-radius-xxl)!important",
+                            margin: ".5rem!important",
+                            border:
+                              "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
+                            boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
+                          }),
+                        }}
+                      />
+                    )}
+                  />
+                )}
                 {errors.city && (
                   <div className="invalid-feedback">
                     Por favor escolha cidade!
@@ -354,7 +425,7 @@ export default function ProfileEdit(props) {
               />
             </div>
             <div className="col-12 d-flex text-center  my-5">
-              {loading ? (
+              {loading_submit ? (
                 <div className="text-center">
                   <div className="spinner-border text-primary" role="status">
                     <span className="visually-hidden">Loading...</span>
