@@ -11,20 +11,35 @@ datasource db {
 }
 
 model pessoa {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(254)
-  surname     String?  @db.VarChar(254)
-  gender      Boolean
-  birthday    DateTime
+  id       String   @id @default(uuid())
+  name     String   @db.VarChar(254)
+  gender   Boolean
+  birthday DateTime
+  surname  String?  @db.VarChar(254)
+  nation   String?  @db.Char(2)
+  height   Int?
+  weight   Int?
+  eyes     Int?
+  hair     String?  @db.VarChar(254)
+  marks    String?  @db.VarChar(254)
+
   create_time DateTime @default(now())
   update_time DateTime @updatedAt
 
-  location_id Int
-  location    location @relation(fields: [location_id], references: [id])
-
+  location_history    location_history[]
   comments            contents[]
   pessoas_on_contacts pessoas_on_contacts[]
+}
 
+model location_history {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  location_id Int
+  location    location @relation(fields: [location_id], references: [id])
+  visited_at  DateTime
+
+  @@index([pessoa_id])
   @@index([location_id])
 }
 
@@ -36,8 +51,8 @@ model location {
   state     Int
   nation    String  @db.Char(2)
 
-  pessoa  pessoa[]
-  contact contact[]
+  location_history location_history[]
+  contact          contact[]
 }
 
 model contents {

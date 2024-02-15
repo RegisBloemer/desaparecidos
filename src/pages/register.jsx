@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
 import toast from "react-hot-toast";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 import Layout from "@/components/layout";
 import Select from "@/components/select";
@@ -137,11 +138,11 @@ export default function ProfileEdit(props) {
           <h1>Informações Básicas</h1>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="g-3 needs-validation"
+            className="g-3 needs-validation mt-5 pt-5"
           >
             <div className="col-sm-6 mx-auto mt-4">
-              <label className="form-label" htmlFor="name">
-                Nome Completo
+              <label htmlFor="name" className="form-label">
+                Nome Completo <span className="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -161,19 +162,18 @@ export default function ProfileEdit(props) {
               )}
             </div>
             <div className="col-sm-6 mx-auto mt-4">
-              <label className="form-label" htmlFor="surname">
+              <label htmlFor="surname" className="form-label">
                 Apelido
               </label>
               <input
                 type="text"
                 id="surname"
                 className={`form-control rounded-5 shadow`}
-                {...register("name")}
               />
             </div>
             <div className="col-sm-6 mx-auto mt-4">
-              <label className="form-label" htmlFor="birthday">
-                Data de nascimento
+              <label htmlFor="name" className="form-label">
+                Data de nascimento <span className="text-danger">*</span>
               </label>
               <input
                 type="date"
@@ -192,8 +192,19 @@ export default function ProfileEdit(props) {
                 </div>
               )}
             </div>
+            <div className="col-sm-6 mx-auto mt-4">
+              <label htmlFor="nation" className="form-label">
+                Nacionalidade
+              </label>
+              <input
+                type="text"
+                id="nation"
+                className="form-control rounded-5 shadow"
+              />
+            </div>
             <div className="row mx-auto mt-4">
-              <div className="col-sm-6">
+              <h5>Último lugar de onde a pessoa foi vista</h5>
+              <div className="col-sm-6 my-3">
                 <label>Selecione seu pais</label>
                 <Controller
                   name="counry"
@@ -234,7 +245,7 @@ export default function ProfileEdit(props) {
                   </div>
                 )}
               </div>
-              <div className="col-sm-6">
+              <div className="col-sm-6 mb-3">
                 <label className="w-100">Selecione seu estado</label>
                 <Controller
                   name="uf"
@@ -273,7 +284,7 @@ export default function ProfileEdit(props) {
                   </div>
                 )}
               </div>
-              <div className="col-sm-6">
+              <div className="col-sm-6 mb-3">
                 <label className="w-100">Selecione sua cidade</label>
                 <Controller
                   name="city"
@@ -312,6 +323,36 @@ export default function ProfileEdit(props) {
                 )}
               </div>
             </div>
+            <div className="col-12 d-flex justify-content-center mt-5">
+              <Controller
+                name="hCaptcha"
+                control={control}
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <HCaptcha
+                    sitekey="677d3abd-134a-4053-ab76-f947a3082aaa"
+                    onVerify={(token) => {
+                      field.onChange(token);
+                      clearErrors("hCaptcha");
+                    }}
+                    onError={() => {
+                      toast.error("Captcha error");
+                      return setError("hCaptcha", {
+                        type: "manual",
+                        message: "Captcha error",
+                      });
+                    }}
+                    onExpire={() => {
+                      toast.error("Captcha expired");
+                      return setError("hCaptcha", {
+                        type: "manual",
+                        message: "Captcha expired",
+                      });
+                    }}
+                  />
+                )}
+              />
+            </div>
             <div className="col-12 d-flex text-center  my-5">
               {loading ? (
                 <div className="text-center">
@@ -324,7 +365,7 @@ export default function ProfileEdit(props) {
                   className="btn btn-primary mx-auto rounded-5 shadow"
                   type="submit"
                 >
-                  Criar conta
+                  Registrar
                 </button>
               )}
             </div>

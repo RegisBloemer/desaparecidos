@@ -38,3 +38,72 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+Um formulário de cadastro de pessoa desaparecida é um documento utilizado por autoridades policiais, organizações não governamentais e websites dedicados a ajudar na busca e localização de pessoas desaparecidas. Esse formulário coleta informações detalhadas sobre a pessoa desaparecida para auxiliar nas buscas. Abaixo, um exemplo de como poderia ser estruturado um formulário de cadastro de pessoa desaparecida:
+
+### TODO:
+
+- Captcha
+- I18n
+- Email
+- PoW
+- Similares
+
+### Informações Básicas
+
+- **Nome Completo da Pessoa Desaparecida:**
+- **Apelido (se houver):**
+- **Data de Nascimento:**
+- **Idade no Momento do Desaparecimento:**
+- **Gênero:**
+- **Nacionalidade:**
+- **Número de Identidade (RG) / Passaporte:**
+
+### Descrição Física
+
+- **Altura:**
+- **Peso Aproximado:**
+- **Cor dos Olhos:**
+- **Cor do Cabelo:**
+- **Marcas Distintivas (tatuagens, cicatrizes, etc.):**
+- **Vestimenta no Momento do Desaparecimento:**
+
+### Informações de Contato
+
+- **Nome do Responsável/Notificante:**
+- **Relação com a Pessoa Desaparecida:**
+- **Endereço Completo:**
+- **Telefones de Contato:**
+- **E-mail:**
+
+### Circunstâncias do Desaparecimento
+
+- **Data do Último Contato:**
+- **Local do Último Contato:**
+- **Pessoas Últimas a Ver a Pessoa Desaparecida:**
+- **Circunstâncias Detalhadas do Desaparecimento (incluindo possíveis motivos, se conhecidos):**
+
+### Informações Adicionais
+
+- **A pessoa desaparecida possui alguma condição médica relevante?**
+- **Existem pessoas ou locais que a pessoa desaparecida possa procurar?**
+- **A pessoa desaparecida possui veículo? Descrição do veículo.**
+
+### Documentação e Arquivos Anexos
+
+- **Fotografias Recentes da Pessoa Desaparecida:**
+- **Cópias de Documentos de Identificação:**
+- **Outros Documentos Relevantes (Boletim de Ocorrência, por exemplo):**
+
+### Autorização
+
+- **Consentimento para Divulgação das Informações:**
+  - [ ] Autorizo a divulgação das informações neste formulário para auxiliar na busca pela pessoa desaparecida.
+
+### Contato de Emergência
+
+- **Nome:**
+- **Relação com a Pessoa Desaparecida:**
+- **Telefones de Contato:**
+
+É importante que este formulário seja preenchido com o máximo de detalhes possíveis para facilitar a identificação e a localização da pessoa desaparecida. Após o preenchimento, ele deve ser entregue às autoridades competentes ou a organizações especializadas na busca de pessoas desaparecidas.
