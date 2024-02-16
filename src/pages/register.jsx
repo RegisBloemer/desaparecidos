@@ -11,6 +11,7 @@ import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 import Layout from "@/components/layout";
 import Select from "@/components/select";
+import Select_eyes from "@/components/select_eyes";
 
 export default function ProfileEdit(props) {
   const {
@@ -56,6 +57,7 @@ export default function ProfileEdit(props) {
     label: "Brazil",
     ISO: "BR",
   });
+  const [select_eye, set_select_eye] = useState(false);
   const [select_uf, set_select_uf] = useState(false);
   const [select_city, set_select_city] = useState(false);
   const [loading_submit, set_loading_submit] = useState(false);
@@ -157,7 +159,7 @@ export default function ProfileEdit(props) {
             onSubmit={handleSubmit(onSubmit)}
             className="g-3 needs-validation mt-5 pt-5"
           >
-            <div className="col-sm-6 mx-auto mt-4">
+            <div className="col-sm-6 mx-auto my-3">
               <label htmlFor="name" className="form-label">
                 Nome Completo <span className="text-danger">*</span>
               </label>
@@ -178,7 +180,7 @@ export default function ProfileEdit(props) {
                 </div>
               )}
             </div>
-            <div className="col-sm-6 mx-auto mt-4">
+            <div className="col-sm-6 mx-auto my-3">
               <label htmlFor="surname" className="form-label">
                 Apelido
               </label>
@@ -188,18 +190,30 @@ export default function ProfileEdit(props) {
                 className="form-control rounded-5 shadow"
               />
             </div>
-            <div className="row mx-auto justify-content-center mt-4">
-              <div className="col-sm-3">
-                <label htmlFor="weight" className="form-label">
-                  Peso aproximado
+            <div className="row justify-content-center">
+              <div className="col-sm-5 mt-3">
+                <label htmlFor="eyes" className="form-label">
+                  Cor dos olhos
                 </label>
-                <input
-                  type="number"
-                  id="weight"
-                  className="form-control rounded-5 shadow"
+                <Controller
+                  name="eyes"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <Select_eyes
+                      {...field}
+                      onChange={(e) => {
+                        set_select_eye(e);
+                        field.onChange(e);
+                      }}
+                      value={select_eye}
+                      instanceId="eye-select"
+                      placeholder=""
+                    />
+                  )}
                 />
               </div>
-              <div className="col-sm-3">
+              <div className="col-sm-5 mt-3">
                 <label htmlFor="name" className="form-label">
                   Data de nascimento <span className="text-danger">*</span>
                 </label>
@@ -220,44 +234,59 @@ export default function ProfileEdit(props) {
                   </div>
                 )}
               </div>
+              <div className="col-sm-5 mt-3">
+                <label htmlFor="weight" className="form-label">
+                  Peso aproximado
+                </label>
+                <input
+                  type="number"
+                  id="weight"
+                  className="form-control px-2 pt-1 m-2 border  rounded-5 shadow"
+                />
+              </div>
+              <div className="col-sm-5 mt-3">
+                <label htmlFor="nation" className="form-label">
+                  Nacionalidade
+                </label>
+                <Controller
+                  name="nation"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <Select
+                      {...field}
+                      options={props.countries}
+                      onChange={(e) => {
+                        set_select_nation(e);
+                        field.onChange(e);
+                      }}
+                      value={select_nation}
+                      instanceId="nation-select"
+                      placeholder=""
+                      styles={{
+                        control: (baseStyles, state) => ({
+                          ...baseStyles,
+                          borderRadius: "var(--bs-border-radius-xxl)!important",
+                          margin: ".5rem!important",
+                          border:
+                            "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
+                          boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
+                          width: "100%"
+                        }),
+                      }}
+                    />
+                  )}
+                />
+              </div>
             </div>
-            <div className="col-sm-6 mx-auto mt-4">
-              <label htmlFor="nation" className="form-label">
-                Nacionalidade
-              </label>
-              <Controller
-                name="nation"
-                control={control}
-                defaultValue=""
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    options={props.countries}
-                    onChange={(e) => {
-                      set_select_nation(e);
-                      field.onChange(e);
-                    }}
-                    value={select_nation}
-                    instanceId="nation-select"
-                    placeholder="Nacionalidade"
-                    styles={{
-                      control: (baseStyles, state) => ({
-                        ...baseStyles,
-                        borderRadius: "var(--bs-border-radius-xxl)!important",
-                        margin: ".5rem!important",
-                        border:
-                          "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
-                        boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
-                      }),
-                    }}
-                  />
-                )}
-              />
-            </div>
-            <div className="row col-sm-9 mx-auto mt-5 pt-5">
-              <h5 className="mb-4">Local onde a pessoa foi vista pela última vez</h5>
+            <div className="row col-sm-9 mx-auto mt-5">
+              <h5 className="mb-4">
+                Local onde a pessoa foi vista pela última vez
+              </h5>
               <div className="col-sm-4 mb-3">
-                <label>Selecione pais</label>
+                <label>
+                  Selecione pais <span className="text-danger">*</span>
+                </label>
                 <Controller
                   name="counry"
                   control={control}
@@ -279,16 +308,6 @@ export default function ProfileEdit(props) {
                       instanceId="countries-select"
                       placeholder="Paises"
                       className={errors.counry ? "is-invalid" : ""}
-                      styles={{
-                        control: (baseStyles, state) => ({
-                          ...baseStyles,
-                          borderRadius: "var(--bs-border-radius-xxl)!important",
-                          margin: ".5rem!important",
-                          border:
-                            "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
-                          boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
-                        }),
-                      }}
                     />
                   )}
                 />
@@ -299,7 +318,9 @@ export default function ProfileEdit(props) {
                 )}
               </div>
               <div className="col-sm-4 mb-3">
-                <label className="w-100">Selecione estado</label>
+                <label className="w-100">
+                  Selecione estado <span className="text-danger">*</span>
+                </label>
                 {loading_uf ? (
                   <div className="text-center">
                     <div className="spinner-border text-primary" role="status">
@@ -325,17 +346,6 @@ export default function ProfileEdit(props) {
                         instanceId="uf-select"
                         placeholder="Estados"
                         className={errors.uf ? "is-invalid" : ""}
-                        styles={{
-                          control: (baseStyles, state) => ({
-                            ...baseStyles,
-                            borderRadius:
-                              "var(--bs-border-radius-xxl)!important",
-                            margin: ".5rem!important",
-                            border:
-                              "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
-                            boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
-                          }),
-                        }}
                       />
                     )}
                   />
@@ -347,7 +357,9 @@ export default function ProfileEdit(props) {
                 )}
               </div>
               <div className="col-sm-4 mb-3">
-                <label className="w-100">Selecione cidade</label>
+                <label className="w-100">
+                  Selecione cidade <span className="text-danger">*</span>
+                </label>
                 {loading_city ? (
                   <div className="text-center">
                     <div className="spinner-border text-primary" role="status">
