@@ -14,14 +14,16 @@ model pessoa {
   id       String   @id @default(uuid())
   name     String   @db.VarChar(254)
   gender   Boolean
-  birthday DateTime
+  birthday DateTime?
   surname  String?  @db.VarChar(254)
   nation   String?  @db.Char(2)
-  height   Int?
-  weight   Int?
+  height   Int?     @db.SmallInt
+  weight   Int?     @db.SmallInt
   eyes     Int?
+  tattoo   Int      @default(0) @db.SmallInt
   hair     String?  @db.VarChar(254)
-  marks    String?  @db.VarChar(254)
+  marks    String?  @db.VarChar(512)
+  clothing String?  @db.VarChar(512)
 
   create_time DateTime @default(now())
   update_time DateTime @updatedAt

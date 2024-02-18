@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import Link from "next/link";
 
 import { useState, useEffect } from "react";
+import { Form } from "react-bootstrap";
 
 import { useForm, Controller } from "react-hook-form";
 import axios from "axios";
@@ -12,6 +13,7 @@ import HCaptcha from "@hcaptcha/react-hcaptcha";
 import Layout from "@/components/layout";
 import Select from "@/components/select";
 import Select_eyes from "@/components/select_eyes";
+import Select_hair from "@/components/select_hair";
 
 export default function ProfileEdit(props) {
   const {
@@ -58,6 +60,7 @@ export default function ProfileEdit(props) {
     ISO: "BR",
   });
   const [select_eye, set_select_eye] = useState(false);
+  const [select_hair, set_select_hair] = useState(false);
   const [select_uf, set_select_uf] = useState(false);
   const [select_city, set_select_city] = useState(false);
   const [loading_submit, set_loading_submit] = useState(false);
@@ -161,7 +164,7 @@ export default function ProfileEdit(props) {
           >
             <div className="col-sm-6 mx-auto my-3">
               <label htmlFor="name" className="form-label">
-                Nome Completo <span className="text-danger">*</span>
+                Nome completo <span className="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -190,6 +193,16 @@ export default function ProfileEdit(props) {
                 className="form-control rounded-5 shadow"
               />
             </div>
+            <div className="col-sm-6 mx-auto my-3">
+              <label htmlFor="clothing" className="form-label">
+                Vestimenta no momento do desaparecimento
+              </label>
+              <input
+                type="text"
+                id="clothing"
+                className="form-control rounded-5 shadow"
+              />
+            </div>
             <div className="row justify-content-center">
               <div className="col-sm-5 mt-3">
                 <label htmlFor="eyes" className="form-label">
@@ -214,8 +227,51 @@ export default function ProfileEdit(props) {
                 />
               </div>
               <div className="col-sm-5 mt-3">
+                <label htmlFor="hair" className="form-label">
+                  Cor do cabelo
+                </label>
+                <Controller
+                  name="hair"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <Select_hair
+                      {...field}
+                      onChange={(e) => {
+                        set_select_hair(e);
+                        field.onChange(e);
+                      }}
+                      value={select_hair}
+                      instanceId="hair-select"
+                      placeholder=""
+                    />
+                  )}
+                />
+              </div>
+              <div className="col-sm-5 mt-3">
                 <label htmlFor="name" className="form-label">
-                  Data de nascimento <span className="text-danger">*</span>
+                  Data do último contato<span className="text-danger">*</span>
+                </label>
+                <input
+                  type="date"
+                  id="visited_at"
+                  className={`form-control px-2 pt-1 m-2 border ${
+                    errors.visited_at ? "is-invalid" : ""
+                  } rounded-5 shadow`}
+                  {...register("visited_at", {
+                    valueAsDate: true,
+                    required: "required",
+                  })}
+                />
+                {errors.visited_at && (
+                  <div className="invalid-feedback">
+                    Por favor insira uma data de nascimento valida!
+                  </div>
+                )}
+              </div>
+              <div className="col-sm-5 mt-3">
+                <label htmlFor="name" className="form-label">
+                  Data de nascimento
                 </label>
                 <input
                   type="date"
@@ -234,6 +290,22 @@ export default function ProfileEdit(props) {
                   </div>
                 )}
               </div>
+              <div className="col-sm-5 mt-3 px-5">
+                <div className="form-check px-5">
+                  <label className="form-check-label" htmlFor="gender">
+                    Peso aproximado
+                  </label>
+
+                  <Form.Check type="checkbox" />
+
+                  <input
+                    className="form-check-input shadow"
+                    type="checkbox"
+                    value=""
+                    id="gender"
+                  />
+                </div>
+              </div>
               <div className="col-sm-5 mt-3">
                 <label htmlFor="weight" className="form-label">
                   Peso aproximado
@@ -241,6 +313,18 @@ export default function ProfileEdit(props) {
                 <input
                   type="number"
                   id="weight"
+                  className="form-control px-2 pt-1 m-2 border  rounded-5 shadow"
+                />
+              </div>
+              <div className="col-sm-5 mt-3">
+                <label htmlFor="tattoo" className="form-label">
+                  Quantidade de tatuagem aproximado
+                </label>
+                <input
+                  type="number"
+                  id="tattoo"
+                  defaultValue="0"
+                  min="0"
                   className="form-control px-2 pt-1 m-2 border  rounded-5 shadow"
                 />
               </div>
@@ -271,7 +355,7 @@ export default function ProfileEdit(props) {
                           border:
                             "var(--bs-border-width) var(--bs-border-style) var(--bs-border-color)!important",
                           boxShadow: "0 .5rem 1rem rgba(0,0,0,.15)!important",
-                          width: "100%"
+                          width: "100%",
                         }),
                       }}
                     />

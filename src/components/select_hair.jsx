@@ -5,57 +5,65 @@ import { FaCircle } from "react-icons/fa";
 
 const options = [
   {
-    value: 5125166,
+    value: 723723,
+    label: "Preto",
+    description: "Um tom muito escuro, quase preto absoluto.",
+  },
+  {
+    value: 3878948,
     label: "Castanho Escuro",
-    description: "É cor rica em melanina, variando de médio a quase preto.",
+    description: "Uma tonalidade profunda e rica de marrom.",
   },
   {
-    value: 9262372,
+    value: 6966850,
+    label: "Castanho Médio",
+    description: "Um marrom equilibrado, nem muito claro nem muito escuro.",
+  },
+  {
+    value: 10978666,
     label: "Castanho Claro",
-    description:
-      "Menos melanina que o castanho escuro, com tons de âmbar a médio, podendo ter nuances douradas.",
+    description: "Um marrom claro com nuances douradas.",
   },
   {
-    value: 2773694,
-    label: "Azul",
-    description:
-      "Baixa concentração de melanina com dispersão da luz, refletindo tons de azul, de claro a intenso.",
+    value: 12097400,
+    label: "Loiro Escuro",
+    description: "Um tom de loiro que tende mais para o marrom.",
   },
   {
-    value: 7263183,
-    label: "Azul Claro",
-    description:
-      "Variação pálida do azul, quase translúcida, sensível à luz, lembra céu claro ou gelo.",
+    value: 14335381,
+    label: "Loiro Médio",
+    description: "Um loiro nem muito claro nem muito escuro, loiro natural",
   },
   {
-    value: 776785,
-    label: "Verde",
-    description:
-      "Raros, com moderada melanina e alto lipocromo, variam de esmeralda a verde opaco.",
+    value: 16774625,
+    label: "Loiro Claro",
+    description: "Um loiro muito claro, quase branco.",
   },
   {
-    value: 11123357,
-    label: "Verde Claro",
-    description:
-      "Tons suaves de verde, misturados com dourado ou castanho, mudam conforme a iluminação.",
+    value: 15792383,
+    label: "Loiro Platinado",
+    description: "Um loiro extremamente claro com um tom frio quase prateado.",
   },
   {
-    value: 16760576,
-    label: "Âmbar",
+    value: 10835753,
+    label: "Ruivo",
     description:
-      "Distintos, com cor dourada ou cobre devido ao lipocromo, de dourado claro a castanho avermelhado.",
+      "Um vermelho profundo e rico, característico dos cabelos ruivos.",
   },
   {
-    value: 12500670,
+    value: 9259587,
+    label: "Acaju",
+    description: "Um marrom avermelhado, uma tonalidade quente e profunda.",
+  },
+  {
+    value: 9473676,
     label: "Cinza",
-    description:
-      "Baixa melanina, tom cinza que pode parecer azul ou verde dependendo da luz.",
+    description: "Representa cabelos grisalhos ou prateados.",
   },
   {
-    value: 9468243,
-    label: "Avelã",
-    description:
-      "Mistura de verde e castanho, com manchas ou raios, anel exterior frequentemente mais escuro.",
+    value: 15658734,
+    label: "Branco",
+    description: "Cabelo totalmente desprovido de pigmento, branco puro.",
   },
 ];
 
@@ -81,7 +89,7 @@ function CustomOption(props) {
   );
 }
 
-function Select_eyes(props) {
+function Select_hair(props) {
   return (
     <>
       <Select
@@ -104,4 +112,4 @@ function Select_eyes(props) {
   );
 }
 
-export default Select_eyes;
+export default Select_hair;
