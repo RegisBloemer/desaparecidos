@@ -11,37 +11,116 @@ datasource db {
 }
 
 model pessoa {
-  id       String   @id @default(uuid())
-  name     String   @db.VarChar(254)
-  gender   Boolean
-<<<<<<< HEAD
-  birthday DateTime
-  surname  String?  @db.VarChar(254)
-  nation   String?  @db.Char(2)
-  height   Int?
-  weight   Int?
-  eyes     Int?
-  hair     String?  @db.VarChar(254)
-  marks    String?  @db.VarChar(254)
-=======
-  birthday DateTime?
-  surname  String?  @db.VarChar(254)
-  nation   String?  @db.Char(2)
-  height   Int?     @db.SmallInt
-  weight   Int?     @db.SmallInt
-  eyes     Int?
-  tattoo   Int      @default(0) @db.SmallInt
-  hair     String?  @db.VarChar(254)
-  marks    String?  @db.VarChar(512)
-  clothing String?  @db.VarChar(512)
->>>>>>> 2b92ec9511258583ddead81424ee8f7cc170dcf8
-
+  id          String   @id @default(uuid())
+  name        String   @db.VarChar(254)
+  gender      Boolean
+  nation      String   @db.Char(2)
+  eyes        Int      @default(5125166)
   create_time DateTime @default(now())
   update_time DateTime @updatedAt
 
   location_history    location_history[]
-  comments            contents[]
   pessoas_on_contacts pessoas_on_contacts[]
+  comments            contents[]
+
+  hair_info       hair_info[]
+  marks_info      marks_info[]
+  deficiency_info deficiency_info[]
+  clothing_info   clothing_info[]
+  tattoo_info     tattoo_info[]
+  weight_info     weight_info[]
+  height_info     height_info[]
+  birthday_info   birthday_info[]
+}
+
+model birthday_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  day         Int?     @db.SmallInt
+  month       Int?     @db.SmallInt
+  year        Int?     @db.SmallInt
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model hair_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  description String   @db.VarChar(254)
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model marks_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  description String   @default("Não possui") @db.VarChar(512)
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model deficiency_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  description String   @default("Não possui") @db.VarChar(512)
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model clothing_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  description String?  @db.VarChar(512)
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model tattoo_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  amount      Int      @default(0) @db.SmallInt
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model weight_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  kg          Int      @default(62) @db.SmallInt
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model height_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  cm          Int      @default(170) @db.SmallInt
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
 }
 
 model location_history {
@@ -85,8 +164,9 @@ model contact {
   name   String   @db.VarChar(254)
   gender Boolean?
 
-  location_id         Int
-  location            location              @relation(fields: [location_id], references: [id])
+  location_id Int
+  location    location @relation(fields: [location_id], references: [id])
+
   pessoas_on_contacts pessoas_on_contacts[]
 
   @@index([location_id])
