@@ -11,11 +11,13 @@ datasource db {
 }
 
 model pessoa {
-  id          String   @id @default(uuid())
-  name        String   @db.VarChar(254)
-  gender      Boolean
-  nation      String   @db.Char(2)
-  eyes        Int      @default(5125166)
+  id       String   @id @default(uuid())
+  name     String   @db.VarChar(254)
+  eyes     Int      @default(5125166)
+  gender   Boolean
+  nation   String   @default("BR") @db.Char(2)
+  birthday DateTime
+
   create_time DateTime @default(now())
   update_time DateTime @updatedAt
 
@@ -30,31 +32,6 @@ model pessoa {
   tattoo_info     tattoo_info[]
   weight_info     weight_info[]
   height_info     height_info[]
-  birthday_info   birthday_info[]
-}
-
-model birthday_info {
-  id          Int      @id @default(autoincrement())
-  pessoa_id   String
-  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
-  day         Int?     @db.SmallInt
-  month       Int?     @db.SmallInt
-  year        Int?     @db.SmallInt
-  trust       Int      @default(0) @db.SmallInt
-  create_time DateTime @default(now())
-
-  @@index([pessoa_id])
-}
-
-model hair_info {
-  id          Int      @id @default(autoincrement())
-  pessoa_id   String
-  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
-  description String   @db.VarChar(254)
-  trust       Int      @default(0) @db.SmallInt
-  create_time DateTime @default(now())
-
-  @@index([pessoa_id])
 }
 
 model marks_info {
@@ -83,7 +60,7 @@ model clothing_info {
   id          Int      @id @default(autoincrement())
   pessoa_id   String
   pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
-  description String?  @db.VarChar(512)
+  description String   @default("") @db.VarChar(254)
   trust       Int      @default(0) @db.SmallInt
   create_time DateTime @default(now())
 
@@ -94,6 +71,7 @@ model tattoo_info {
   id          Int      @id @default(autoincrement())
   pessoa_id   String
   pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  description String   @default("Não possui") @db.VarChar(254)
   amount      Int      @default(0) @db.SmallInt
   trust       Int      @default(0) @db.SmallInt
   create_time DateTime @default(now())
@@ -117,6 +95,18 @@ model height_info {
   pessoa_id   String
   pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
   cm          Int      @default(170) @db.SmallInt
+  trust       Int      @default(0) @db.SmallInt
+  create_time DateTime @default(now())
+
+  @@index([pessoa_id])
+}
+
+model hair_info {
+  id          Int      @id @default(autoincrement())
+  pessoa_id   String
+  pessoa      pessoa   @relation(fields: [pessoa_id], references: [id])
+  description String   @db.VarChar(254)
+  cor         Int      @default(723723) @db.SmallInt
   trust       Int      @default(0) @db.SmallInt
   create_time DateTime @default(now())
 

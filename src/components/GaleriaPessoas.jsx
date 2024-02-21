@@ -1,34 +1,58 @@
 import React, { useEffect, useState } from 'react';
+import { Container, Row, Col, Card, Image, Pagination } from 'react-bootstrap';
 
 function GaleriaPessoas() {
-const [pessoas, setPessoas] = useState([]);
+    const [pessoas, setPessoas] = useState([]);
+    const [paginaAtual, setPaginaAtual] = useState(1);
+    const pessoasPorPagina = 16;
+    const indiceUltimaPessoa = paginaAtual * pessoasPorPagina;
+    const indicePrimeiraPessoa = indiceUltimaPessoa - pessoasPorPagina;
+    const pessoasAtuais = pessoas.slice(indicePrimeiraPessoa, indiceUltimaPessoa);
+    const totalPaginas = Math.ceil(pessoas.length / pessoasPorPagina);
 
-useEffect(() => {
-const fetchPessoas = async () => {
-    const response = await fetch('/pessoas_fakes.json');
-    const data = await response.json();
-    const pessoasOrdenadas = data.pessoas.sort((a, b) => new Date(b.create_time) - new Date(a.create_time));
-    setPessoas(pessoasOrdenadas);
-};
+    useEffect(() => {
+        const fetchPessoas = async () => {
+            const response = await fetch('/pessoas_fakes.json');
+            const data = await response.json();
+            const pessoasOrdenadas = data.pessoas.sort((a, b) => new Date(b.create_time) - new Date(a.create_time));
+            setPessoas(pessoasOrdenadas);
+        };
 
-fetchPessoas();
-}, []);
+        fetchPessoas();
+    }, []);
 
-return (
-<div className="galeria-container" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '20px', padding: '20px' }}>
-    {pessoas.map((pessoa) => (
-    <div key={pessoa.id} className="pessoa-card" style={{ border: '1px solid #ccc', borderRadius: '5px', padding: '10px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div className="pessoa-foto" style={{ width: '100px', height: '100px', backgroundColor: '#f0f0f0', borderRadius: '50%', marginBottom: '10px' }}></div>
-        <div className="pessoa-info">
-        <h4>{pessoa.name}</h4>
-        <p>Altura: {pessoa.height}cm</p>
-        <p>Cabelo: {pessoa.hair}</p>
-        <p>Nacionalidade: {pessoa.nation}</p>
-        </div>
-    </div>
-    ))}
-</div>
-);
+    let items = [];
+    for (let number = 1; number <= totalPaginas; number++) {
+        items.push(
+            <Pagination.Item key={number} active={number === paginaAtual} onClick={() => setPaginaAtual(number)}>
+                {number}
+            </Pagination.Item>,
+        );
+    }
+
+    return (
+        <Container style={{ padding: '20px' }}>
+            <h2 className="text-center mb-4">Pessoas desaparecidas recentemente</h2>
+            <Row xs={1} md={4} className="g-4">
+                {pessoasAtuais.map((pessoa) => (
+                    <Col key={pessoa.id}>
+                        <Card>
+                            <Card.Body className="text-center">
+                                <Image src="path/to/image" roundedCircle style={{ width: '100px', height: '100px', backgroundColor: '#f0f0f0' }} />
+                                <Card.Title>{pessoa.name}</Card.Title>
+                                <Card.Text>
+                                    Altura: {pessoa.height}cm<br />
+                                    Cabelo: {pessoa.hair}<br />
+                                    Nacionalidade: {pessoa.nation}
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                ))}
+            </Row>
+            <Pagination className="justify-content-center mt-4">{items}</Pagination>
+        </Container>
+    );
 }
 
 export default GaleriaPessoas;

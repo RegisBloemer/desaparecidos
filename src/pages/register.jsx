@@ -2,7 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import Link from "next/link";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Form } from "react-bootstrap";
 
 import { useForm, Controller } from "react-hook-form";
@@ -21,8 +21,13 @@ export default function ProfileEdit(props) {
     handleSubmit,
     setValue,
     control,
+    watch,
     formState: { errors },
-  } = useForm();
+  } = useForm({
+    defaultValues: {
+      indeterminateCheckbox: false,
+    },
+  });
 
   const get_uf = async (select_counry) => {
     if (!select_counry) {
@@ -66,6 +71,15 @@ export default function ProfileEdit(props) {
   const [loading_submit, set_loading_submit] = useState(false);
   const [loading_uf, set_loading_uf] = useState(false);
   const [loading_city, set_loading_city] = useState(false);
+
+  const isIndeterminate = watch("gender"); // Supondo uma condição simples aqui
+  const checkboxRef = useRef(null);
+
+  useEffect(() => {
+    if (checkboxRef.current) {
+      checkboxRef.current.indeterminate = isIndeterminate;
+    }
+  }, [isIndeterminate]);
 
   useEffect(() => {
     get_uf(select_counry).then((e) => {
@@ -160,7 +174,7 @@ export default function ProfileEdit(props) {
           <h4>Informações Básicas</h4>
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="g-3 needs-validation mt-5 pt-5"
+            className="needs-validation mt-5 pt-5"
           >
             <div className="col-sm-6 mx-auto my-3">
               <label htmlFor="name" className="form-label">
@@ -184,24 +198,17 @@ export default function ProfileEdit(props) {
               )}
             </div>
             <div className="col-sm-6 mx-auto my-3">
-              <label htmlFor="surname" className="form-label">
-                Apelido
-              </label>
-              <input
-                type="text"
-                id="surname"
-                className="form-control rounded-5 shadow"
-              />
-            </div>
-            <div className="col-sm-6 mx-auto my-3">
-              <label htmlFor="clothing" className="form-label">
-                Vestimenta no momento do desaparecimento
-              </label>
-              <input
-                type="text"
-                id="clothing"
-                className="form-control rounded-5 shadow"
-              />
+              <div className="form-floating">
+                <textarea
+                  className="form-control shadow"
+                  placeholder="Leave a comment here"
+                  id="clothing"
+                  rows="3"
+                ></textarea>
+                <label for="clothing">
+                  Vestimenta no momento do desaparecimento
+                </label>
+              </div>
             </div>
             <div className="row justify-content-center">
               <div className="col-sm-5 mt-3">
@@ -289,13 +296,21 @@ export default function ProfileEdit(props) {
               <div className="col-sm-5 mt-3 px-5">
                 <div className="form-check px-5">
                   <label className="form-check-label" htmlFor="gender">
-                    Peso aproximado
+                    Genero
                   </label>
-                  <Form.Check
-                    id="gender"
-                    type="checkbox"
-                    value=""
-                    className="form-check-input shadow"
+
+                  <Controller
+                    control={control}
+                    name="gender"
+                    render={({ field }) => (
+                      <Form.Check
+                        type="checkbox"
+                        label="Genero"
+                        ref={checkboxRef}
+                        {...field}
+                        onChange={(e) => setValue("gender", e.target.checked)}
+                      />
+                    )}
                   />
                 </div>
               </div>
