@@ -2,7 +2,6 @@ import axios from "axios";
 import * as cheerio from "cheerio";
 import { parse } from "date-fns";
 
-
 export default async function handler(req, res) {
   const { page = 1, per_page = 3 } = req.query;
 
@@ -10,7 +9,7 @@ export default async function handler(req, res) {
     const response_rs = await axios.get(
       "https://www.pc.rs.gov.br/_service/desaparecidos/listhtml",
       {
-        params: { pagina: page+1 },
+        params: { pagina: page + 1 },
       }
     );
 
@@ -21,20 +20,20 @@ export default async function handler(req, res) {
       }
     );
 
-    let dados = {rs: null, sc: null, pessoas: []}
+    let dados = { rs: null, sc: null, pessoas: [] };
 
     // Verifica se a resposta contém dados
     if (!response_rs || !response_rs.data) {
       console.log("response_rs inválida ou vazia.");
     } else {
-      dados.rs = parsePcRSData(response_rs.data)
+      dados.rs = await parse_pc_rs(response_rs.data);
     }
 
     // Verifica se a resposta contém dados
     if (!response_sc || !response_sc.data) {
       console.log("response_sc inválida ou vazia.");
     } else {
-      dados.sc = parsePcSCData(response_sc.data)
+      dados.sc = await parse_pc_sc(response_sc.data);
     }
 
     res.status(200).json(dados);
@@ -44,28 +43,137 @@ export default async function handler(req, res) {
   }
 }
 
-async function predict_name(name) {
-  const genderize_apikey = process.env.GENDERIZE_APIKEY; // Variável de ambiente do servidor
+async function predict_name(name, country_id) {}
 
-  axios.request({
-    method: 'get',
-    url: `https://api.genderize.io?name=${name}&country_id=BR&apikey=${genderize_apikey}`
-  })
-  .then((response) => {
-    console.log(JSON.stringify(response.data));
-  })
-  .catch((error) => {
-    console.log(error);
-  });
+async function agify(name, country_id) {
+  let data = {
+    age: Number(),
+  };
 
+  try {
+    const response = await axios.get(
+      `https://api.agify.io?name=${name}&country_id=${country_id}`
+    );
+
+    data["age"] = Number(response.data["age"]);
+
+    return data;
+  } catch (error) {
+    if (error.response) {
+      const { status, data } = error.response;
+
+      // Mapeamento de erros
+      const errors = {
+        401: "API key inválido",
+        402: "Assinatura não ativa",
+        422:
+          data.error === "Missing 'name' parameter"
+            ? "Parâmetro 'name' ausente"
+            : "Parâmetro 'name' inválido",
+        429:
+          data.error === "Request limit reached"
+            ? "Limite de requisições atingido"
+            : "Limite de requisições baixo demais",
+      };
+
+      console.error(errors[status] || `Erro desconhecido: ${data.error}`);
+    } else if (error.request) {
+      console.error("Nenhuma resposta da API:", error.request);
+    } else {
+      console.error("Erro ao configurar a requisição:", error.message);
+    }
+  }
 }
 
-function parsePcRSData(html) {
+async function nationalize(name) {
+  let data = {
+    country_id: String(),
+    country: [],
+  };
+
+  try {
+    const response = await axios.get(`https://api.nationalize.io?name=${name}`);
+
+    data["country_id"] = String(response.data["country"][0]["country_id"]);
+    data["country"] = response.data.country;
+
+    return data;
+  } catch (error) {
+    if (error.response) {
+      const { status, data } = error.response;
+
+      // Mapeamento de erros da Nationalize
+      const errors = {
+        401: "API key inválido",
+        402: "Assinatura não ativa",
+        422:
+          data.error === "Missing 'name' parameter"
+            ? "Parâmetro 'name' ausente"
+            : "Parâmetro 'name' inválido",
+        429:
+          data.error === "Request limit reached"
+            ? "Limite de requisições atingido"
+            : "Limite de requisições baixo demais",
+      };
+
+      console.error(errors[status] || `Erro desconhecido: ${data.error}`);
+    } else if (error.request) {
+      console.error("Nenhuma resposta da API:", error.request);
+    } else {
+      console.error("Erro ao configurar a requisição:", error.message);
+    }
+  }
+}
+
+async function genderize(name, country_id) {
+  let data = {
+    gender: String(),
+    probability: Number(),
+  };
+
+  try {
+    const response = await axios.get(
+      `https://api.genderize.io?name=${name}&country_id=${country_id}`
+    );
+
+    data["gender"] = String(response.data["gender"]);
+    data["probability"] = Number(response.data["probability"]);
+
+    console.log("gen",response.data)
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      const { status, data } = error.response;
+
+      // Mapeamento de erros
+      const errors = {
+        401: "API key inválido",
+        402: "Assinatura não ativa",
+        422:
+          data.error === "Missing 'name' parameter"
+            ? "Parâmetro 'name' ausente"
+            : "Parâmetro 'name' inválido",
+        429:
+          data.error === "Request limit reached"
+            ? "Limite de requisições atingido"
+            : "Limite de requisições baixo demais",
+      };
+
+      console.error(errors[status] || `Erro desconhecido: ${data.error}`);
+    } else if (error.request) {
+      console.error("Nenhuma resposta da API:", error.request);
+    } else {
+      console.error("Erro ao configurar a requisição:", error.message);
+    }
+  }
+}
+
+async function parse_pc_rs(html) {
   const $ = cheerio.load(html);
-  const desaparecidos = [];
+  let data = [];
 
   $(".card-desaparecido").each((index, element) => {
-    const nome = $(element).find(".card-desaparecido-nome").text().trim();
+    const name = $(element).find(".card-desaparecido-nome").text().trim();
     const nascimento = $(element)
       .find(".card-desaparecido-info p")
       .eq(0)
@@ -77,92 +185,159 @@ function parsePcRSData(html) {
       .eq(0)
       .text()
       .trim();
-    const local = $(element)
+    const city = $(element)
       .find(".card-desaparecido-info p strong")
       .eq(1)
       .text()
       .trim();
-    const foto_url = $(element).find(".card-desaparecido-imagem").attr("src");
+
+    const photo = $(element).find(".card-desaparecido-imagem").attr("src");
     const link = $(element).find(".card-desaparecido-link").attr("href");
 
-    let birthday = parse(nascimento, "dd/MM/yyyy", new Date());
-    let last_appearance = parse(desaparecimento, "dd/MM/yyyy", new Date());
-
-    let pc_rs = {
-      nome,
-      birthday: birthday.toISOString(),
-      last_appearance: last_appearance.toISOString(),
-      local,
-      foto_url,
-      sexo: null,
-      id1: null,
-      id2: null,
-    };
-
-    let imgs = [];
-    if (
-      !foto_url.startsWith(
-        "/themes/modelo-noticias2/images/outros/silhuetas_desaparecidos"
-      )
-    ) {
-      const matches = foto_url.match(/(\d+)\/(\d+)\.JPG/);
-      if (matches) {
-        pc_rs["id1"] = Number(matches[1]);
-        pc_rs["id2"] = Number(matches[2]);
-        imgs.push(
-          `https://www.delegaciaonline.rs.gov.br/dol/api/desaparecidos/consultaFoto/${pc_rs["id1"]}/${pc_rs["id1"]}.JPG`
-        );
-      }
-    }
-
-    desaparecidos.push({
-      pc_rs,
-      imgs,
+    data.push({
+      name,
+      nascimento,
+      desaparecimento,
+      city,
+      photo,
+      link,
     });
   });
+
+  const desaparecidos = await Promise.all(
+    data.map(async (pessoa) => {
+      const { name, nascimento, desaparecimento, city, photo, link } =
+        pessoa;
+      let birthday = parse(nascimento, "dd/MM/yyyy", new Date());
+      let last_appearance = parse(desaparecimento, "dd/MM/yyyy", new Date());
+
+      let others = { };
+
+      let imgs = [];
+      let main_photo = photo
+      if (
+        !photo.startsWith(
+          "/themes/modelo-noticias2/images/outros/silhuetas_desaparecidos"
+        )
+      ) {
+        const matches = photo.toLowerCase().match(/(\d+)\/(\d+)\.jpg/);
+        if (matches) {
+          others["id1"] = Number(matches[1]);
+          others["id2"] = Number(matches[2]);
+        }
+      } else {
+        main_photo = ""
+      }
+
+      let gender
+      try {
+        const genderize_data = await genderize(name, "BR");
+        gender = genderize_data.gender == "male" ? 1 : 0;
+        others = { ...others, gender_probability: genderize_data.probability };
+      } catch (error) {
+        console.log("catch genderize")
+        gender = null
+      }
+
+      let nationality
+      try {
+        const nationalize_data = await nationalize(name);
+
+        nationality = nationalize_data.country_id;
+        if (nationalize_data.country[1] == "BR") {
+          nationality = "BR";
+        }
+      } catch (error) {
+        nationality = "BR";
+      }
+
+      let location_history = [
+        {
+          visited_at: last_appearance.toISOString(),
+          //neighborhood: "",
+          city: city,
+          uf: "RS",
+          country: "BR",
+        },
+      ];
+
+      return {
+        name,
+        birthday: birthday.toISOString(),
+        last_appearance: last_appearance.toISOString(),
+        gender,
+        location_history,
+        nationality,
+        tattoo: "",
+        main_photo,
+        imgs,
+        others: others,
+      };
+    })
+  );
 
   return desaparecidos;
 }
 
-function parsePcSCData(jsonData) {
-  const desaparecidos = [];
+async function parse_pc_sc(jsonData) {
+  const desaparecidos = await Promise.all(
+    jsonData.map(async (pessoa) => {
+      const name = pessoa.nomePessoa
+      const main_photo = `https://devs.pc.sc.gov.br/servicos/desaparecidos/images/${pessoa.numeroBasePessoa}/${pessoa.fotoPrincipal}.jpg`;
 
-  jsonData.forEach((pessoa) => {
-    const nome = pessoa.nomePessoa;
-    const idade = pessoa.idadeDesaparecimento;
-    const desaparecimento = pessoa.dataFato; // já vem em formato ISO, então podemos usar diretamente
-    const municipio = pessoa.municipio;
-    const bairro = pessoa.bairro;
-    const sexo = pessoa.sexo;
-    const foto_url = `https://devs.pc.sc.gov.br/servicos/desaparecidos/images/${pessoa.numeroBasePessoa}/${pessoa.fotoPrincipal}.jpg`;
-    const tatuagem = pessoa.tatuagem || "Nenhuma";
+      let last_appearance = parse(
+        pessoa.dataFato,
+        "yyyy-MM-dd'T'HH:mm:ss.SSSX",
+        new Date()
+      );
 
-    let last_appearance = parse(desaparecimento, "yyyy-MM-dd'T'HH:mm:ss.SSSX", new Date());
+      let birthday = last_appearance; // Calculando data nacimento
+      birthday.setFullYear(
+        birthday.getFullYear() - Number(pessoa.idadeDesaparecimento)
+      );
 
-    // Cria um novo objeto Date para a data atual
-    let birthday = new Date();
+      let gender = pessoa.sexo == "Masculino" ? 1 : 0;
 
-    // Subtrai 10 anos da data atual
-    birthday.setFullYear(birthday.getFullYear() - Number(idade));
+      let nationality
+      try {
+        const nationalize_data = await nationalize(name);
 
-    let pc_sc = {
-      nome,
-      birthday: birthday.toISOString(),
-      last_appearance: last_appearance.toISOString(),
-      municipio,
-      bairro,
-      sexo,
-      tatuagem,
-      foto_url,
-      id1: pessoa.numeroBasePessoa,
-      id2: pessoa.fotoPrincipal,
-    };
+        nationality = nationalize_data.country_id;
+        if (nationalize_data.country[1] == "BR") {
+          nationality = "BR";
+        }
+      } catch (error) {
+        nationality = "BR";
+      }
 
-    desaparecidos.push({
-      pc_sc,
-      imgs: [foto_url], // Usamos o URL da foto principal diretamente
-    });
-  });
+      let location_history = [
+        {
+          visited_at: last_appearance.toISOString(),
+          neighborhood: pessoa.bairro,
+          city: pessoa.municipio,
+          uf: "SC",
+          country: "BR",
+        },
+      ];
+
+      let imgs = pessoa.pics.map((e) => {
+        `https://devs.pc.sc.gov.br/servicos/desaparecidos/images/${pessoa.numeroBasePessoa}/${e}.jpg`;
+      });
+
+      return {
+        name,
+        birthday: birthday.toISOString(),
+        last_appearance: last_appearance.toISOString(),
+        gender,
+        location_history,
+        nationality,
+        tattoo: pessoa.tatuagem,
+        main_photo,
+        imgs,
+        others: { numeroBasePessoa: pessoa.numeroBasePessoa },
+      };
+    })
+  );
 
   return desaparecidos;
 }
