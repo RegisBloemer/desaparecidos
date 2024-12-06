@@ -4,11 +4,11 @@ export default function Document() {
   return (
     <Html lang="pt">
       <Head>
+        <meta name="viewport" content="viewport-fit=cover" />
         <meta name="description" content="Desaparecidos" />
         <link rel="icon" href="/favicon.ico" />
         <meta httpEquiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta content="IE=edge" httpEquiv="X-UA-Compatible" />
-        <meta content="width=device-width, initial-scale=1.0" name="viewport" />
         <meta name="description" content="Desaparecidos" />
         <meta
           property="og:url"
@@ -25,6 +25,7 @@ export default function Document() {
         <meta name="twitter:description" content="Desaparecidos" />
         <meta name="twitter:image" content="/favicon.ico" />
         <meta name="image" content="/favicon.ico" />
+        <meta name="algolia-site-verification"  content="30E5665362A50A80" />
       </Head>
       <body>
         <Main />
